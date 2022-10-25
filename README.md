@@ -42,10 +42,15 @@ npx hardhat run scripts/deploy.ts
 npx hardhat run scripts/deploy.ts --network ganache
 ```
 
+5. 把部署合约得到的两个合约地址写入前端`contract-address.json`文件中
 5. 在 `./frontend` 中启动前端程序，运行如下的命令：
 
 ```bash
 npm run start
 ```
 
-## 
+
+
+lottery contract has been deployed successfully in 0xdfa11bAED53e5A44120137785b7429CA4eEb5cE8
+
+erc20 contract has been deployed successfully in 0xFfF8fa5b7f096cd13608f8149384a87D8190059C
