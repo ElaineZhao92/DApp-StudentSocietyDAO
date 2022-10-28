@@ -49,5 +49,6 @@ npx hardhat run scripts/deploy.ts --network ganache
 npm run start
 ```
 
+##### Project Show
 
 初步的1.0版本已经完成，部署方法如上。陆续还会完成bonus部分
