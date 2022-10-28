@@ -49,8 +49,3 @@ npx hardhat run scripts/deploy.ts --network ganache
 npm run start
 ```
 
-
-
-lottery contract has been deployed successfully in 0xdfa11bAED53e5A44120137785b7429CA4eEb5cE8
-
-erc20 contract has been deployed successfully in 0xFfF8fa5b7f096cd13608f8149384a87D8190059C
