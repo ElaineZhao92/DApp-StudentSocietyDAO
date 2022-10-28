@@ -14,7 +14,7 @@ contract MyERC20 is ERC20 {
     function airdrop() external {
         require(claimedAirdropPlayerList[msg.sender] == false, "This user has claimed airdrop already");
         //_mint()是openzeppelin中ERC20的函数，用于分发ETH
-        _mint(msg.sender, 100);
+        _mint(msg.sender, 1000);
         claimedAirdropPlayerList[msg.sender] = true;
     }
 

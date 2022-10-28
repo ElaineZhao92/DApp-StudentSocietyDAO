@@ -1,0 +1,50 @@
+@import '~antd/dist/antd.css';
+
+.container {
+  width: 600px;
+  height: 2000px;
+
+  background: #F2F3F4;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.main {
+  padding: 10px;
+  text-align:left;
+}
+
+:root{
+    /* colors */
+    --primary-50: #e0fcff;
+    --primary-100: #bef8fd;
+    --primary-200: #87eaf2;
+    --primary-300: #54d1db;
+    --primary-400: #38bec9;
+    --primary-500: #2cb1bc;
+    --primary-600: #14919b;
+    --primary-700: #0e7c86;
+    --primary-800: #0a6c74;
+    --primary-900: #044e54;
+    agree:#bed742a5;
+    disagree:#ef973e;
+    nottime:#f4e1b4;
+    /* grey */
+    --grey-50: #f0f4f8;
+    --grey-100: #d9e2ec;
+    --grey-200: #bcccdc;
+    --grey-300: #9fb3c8;
+    --grey-400: #829ab1;
+    --grey-500: #627d98;
+    --grey-600: #486581;
+    --grey-700: #334e68;
+    --grey-800: #243b53;
+    --grey-900: #102a43;
+}
