@@ -1,2 +1,2 @@
-import Header from './head.png'
-export {Header}
+import Head from './head.png'
+export {Head}

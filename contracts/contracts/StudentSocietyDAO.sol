@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./MyERC20.sol";
+import "./MyERC721.sol";
 // Uncomment the line to use openzeppelin/ERC20
 // You can use this dependency directly because it has been installed already
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -17,6 +18,7 @@ contract StudentSocietyDAO {
     address[] public student;   // 学生
     address public winner;      // 提案者(获得分数最高的)
     MyERC20 public studentERC20;// 相关的代币合约
+    MyERC721 public studentERC721; //相关NFT合约
     uint32 pro_num;
     uint32 constant voteCost = 100;
     uint32 constant proposeCost = 300;
@@ -37,13 +39,15 @@ contract StudentSocietyDAO {
 
     address public manager;
     mapping(uint32 => Proposal) proposals; // A map from proposal index to proposal
-    
+    mapping(address => uint32) published_proposals_; // A  map from proposer to the num of proposals he published
+    mapping(address => uint256) tokenId;
     // ...
     // TODO add any variables if you want
 
     constructor() {
         // maybe you need a constructor
         studentERC20 = new MyERC20("StudentDAO", "ERC");
+        studentERC721 = new MyERC721("StudentDAO", "NFT");
         pro_num = 0;
         manager = msg.sender;
     }
@@ -95,6 +99,10 @@ contract StudentSocietyDAO {
     // 获得不同意的票数
     function getDisapprovement(uint32 index) external view returns (uint32){
         return proposals[index].disapprovement;
+    }
+    // 获得该地址得到的tokenid
+    function getTokenId(address proposer) public view returns(uint256){
+        return tokenId[proposer];
     }
 
     // 投票 转通证积分
@@ -152,7 +160,19 @@ contract StudentSocietyDAO {
         proposals[index].publishment = true;
         if(proposals[index].approvement >= proposals[index].disapprovement){
             // 对提议提出者转账所有的approvement通行证
+            published_proposals_[proposals[index].proposer] += 1;
             studentERC20.transfer(proposals[index].proposer, proposals[index].approvement * voteCost);
-        }
+            if(published_proposals_[proposals[index].proposer] == 3){
+                // 随机分发一个tokenId, tokenId是0～10000的随机整数
+                uint256 tokenid = rand_int256(10000);
+                studentERC721.mint(proposals[index].proposer, tokenid);
+                tokenId[proposals[index].proposer] = tokenid;
+            }
+        }  
+    }
+    
+    function rand_int256(uint256 length) public view returns(uint256){
+        uint256 hash = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)));
+        return hash % length;
     }
 }

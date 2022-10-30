@@ -1,15 +1,14 @@
-import {Button, Image, List, Divider, InputNumber, Input, Space, Avatar} from 'antd';
-import {HistoryOutlined, EllipsisOutlined, UserOutlined} from "@ant-design/icons";
-import {Header} from "../../pic"
+import {Button, Image, List, Divider, InputNumber, Input, Space, Avatar, Carousel, Col, Row, Statistic} from 'antd';
+import {LoadingOutlined, EllipsisOutlined, UserOutlined, EditOutlined,SmileOutlined, FrownOutlined, CheckCircleOutlined} from "@ant-design/icons";
+import {Head} from "../../pic"
 import {useEffect, useState, createElement} from 'react';
-import {studentDAOContract, myERC20Contract, web3} from "../../utils/contracts";
+import {studentDAOContract, myERC20Contract, myERC721Contract, web3} from "../../utils/contracts";
 import React from 'react';
 import './index.css';
 
 const GanacheTestChainId = '0x539' // Ganache默认的ChainId = 0x539 = Hex(1337)
 const GanacheTestChainName = 'Ganache Test Chain'
 const GanacheTestChainRpcUrl = 'http://127.0.0.1:8545'
-const { TextArea } = Input;
 
 interface Proposal {
     index:number;      // index of this proposal
@@ -20,6 +19,19 @@ interface Proposal {
     approvement:number;
     disapprovement:number;
 }
+
+interface NFT{
+    tokenId: number;
+    icon: string;       // NFT icon which can be purchased
+}
+
+const contentStyle: React.CSSProperties = {
+    height: '160px',
+    color: '#fff',
+    lineHeight: '160px',
+    textAlign: 'center',
+    background: '#364d79',
+  };
 
 const StudentDAOPage = () => {
     /* ---- account/user or manager ---- */
@@ -34,12 +46,14 @@ const StudentDAOPage = () => {
     const [totalProposalAmount, setTotalProposalAmount] = useState(0)
     const [proposalList, setProposalList] = useState<Proposal[]>([])
     const [duration, setDuration] = useState(0)
+    /* ---- NFT ---- */
+    const [NFTAmount, setNFTAmount] = useState(0)
+    const [NFTList, setNFTList] = useState<NFT[]>([])
     /* ---- const ----*/
     const [costForVote, setCostForVote] = useState(0)
     const [costForPropose, setCostForPropose] = useState(0)
     /* ---- flag ---- */
     const [flag, setFlag] = useState(0)
-    /* ---- other settings ---- */
 
     const ProposalTableList = ({ start, duration,approvement, disapprovement, proposer }: { start: number; duration:number; approvement:number; disapprovement:number ; proposer: string}) => (
         <div>
@@ -52,10 +66,11 @@ const StudentDAOPage = () => {
             <Space>
                 <div></div>
                 <div></div>
-                {createElement(HistoryOutlined)}
-                {new Date(start * 1000).toLocaleString()}
-                {createElement(EllipsisOutlined)}
                 <div></div>
+                <div></div>
+                {new Date(start * 1000).toLocaleString()}
+                <div></div>
+                {createElement(EllipsisOutlined)}
                 <div></div>
                 {new Date(start * 1000 + duration * 1000).toLocaleString()}
             </Space>
@@ -107,13 +122,40 @@ const StudentDAOPage = () => {
                 alert('Contract not exists.')
             }
         }
+        const updateNFTAmount = async (account:string) => {
+            // 利用ERC721合约的balanceOf函数查看该合约下分发的NFT总数
+            const cnt = await myERC721Contract.methods.balanceOf(account).call()
+            setNFTAmount(cnt)
+        }
 
         updateProposalAmount()
         updateCost()
         if(account !== '') {
             getAccountInfo()
+            updateNFTAmount(account)
         }
     }, [flag, account])
+
+    useEffect(() => {
+        const updateNFT = async(account: string) => {
+            let nft: NFT[] = []
+            const amount = await myERC721Contract.methods.totalSupply().call()
+            // traverse all the NFT
+            for (var i = 0; i < amount; i++ ){
+                const tokenId = await myERC721Contract.methods.tokenByIndex(i).call()
+                const owner = await myERC721Contract.methods.ownerOf(tokenId).call()
+                if (owner === account){
+                    nft.push({tokenId: tokenId, icon: ""})
+                }
+            }
+            setNFTList(nft)
+        }
+        if(account !== ''){
+            updateNFT(account)
+        }
+            
+
+    }, [account,flag])
 
 
     useEffect(()=> {
@@ -133,6 +175,7 @@ const StudentDAOPage = () => {
         }
 
         updateProposalList()
+
     }, [totalProposalAmount, flag])
 
     useEffect(() => {
@@ -192,6 +235,10 @@ const StudentDAOPage = () => {
                         from: account
                     })
                     alert('公布结果!')
+                    //需要更新NFTList
+                    
+                    
+                    setFlag(1-flag)
                 } catch (error: any) {
                     alert(error.message)
                 }
@@ -276,7 +323,20 @@ const StudentDAOPage = () => {
 
     return (
         <div className='container'>
-            <Image width='70%' height='130px' preview={false} src={Header} />
+            <Carousel autoplay>
+                <div>
+                    <Image  preview={{ visible: false }} width='70%' height='120px' src={Head} style={contentStyle}/>
+                </div>
+                <div>
+                    <h3 style={contentStyle}>2</h3>
+                </div>
+                <div>
+                    <h3 style={contentStyle}>3</h3>
+                </div>
+                <div>
+                    <h3 style={contentStyle}>4</h3>
+                </div>
+            </Carousel>
             <div className='main'>
                 <h2 style = {{color:'#0a6c74'}}>去中心化学生社团组织管理平台</h2>
                 <h1 style = {{color:'#14919b'}}>studentDAO</h1>
@@ -286,7 +346,20 @@ const StudentDAOPage = () => {
                     <div style = {{color:'#14919b'}}>当前用户：<span style = {{color:'#044e54'}}>{account === '' ? '无用户连接' : account}</span></div>
                     <Button onClick={onClaimTokenAirdrop} style = {{color:'#044e54'}}>领取通证积分</Button>
                     <div style = {{color:'#14919b'}}>当前用户拥有通证积分: <span style = {{color:'#044e54'}}>{account === '' ? 0 : accountBalance}</span></div>
-                    <div><h5></h5></div>
+                        <div className="NFTs">
+                        <List
+                            size="small"
+                            bordered
+                            header={<div style = {{color:'#14919b'}}>{NFTAmount == 0? "您暂时还未获得NFT, 如果您有3条提案被通过, 将获得专属NFT" : "您获得的NFT编号如下"}</div>}
+                            dataSource={NFTList}
+                            renderItem={item => (
+                                <List.Item>
+                                    <List.Item.Meta
+                                    title={item.tokenId}
+                                    />
+                                </List.Item>)}
+                            />
+                        </div>
                     <div style = {{color:'#14919b'}}>
                         <span style = {{color:'#044e54'}}>Tips: </span>通证积分可以用来投票、提出proposal等
                     </div>
@@ -307,17 +380,17 @@ const StudentDAOPage = () => {
                             <Space>
                                 <Input showCount maxLength = {200} onChange={(e) => setProposeName(e.target.value)} placeholder="提案内容" allowClear 
                                     style={{width:'382px'}}/>
-                                <Input onChange={(e) => setProposer(e.target.value)} placeholder="您的姓名" />
+                                <Input onChange={(e) => setProposer(e.target.value)} placeholder="您的姓名(可以匿名)" />
                             </Space>
                             
                             <Space>
                                 <InputNumber min={costForPropose} step={costForVote} 
                                     onChange={(e)=>setVoteAmount(e!)} 
                                     addonAfter="Tokens" 
-                                    placeholder="投入通证积分的个数" />
+                                    placeholder="投入通证积分个数(最少300)" />
                                 <InputNumber min={20} 
                                     onChange={(e)=>setDuration(e!)} 
-                                    addonAfter="秒" placeholder="有效时间" />
+                                    addonAfter="秒" placeholder="投票持续时间" />
                                 <Button onClick={onCreateProposal}>提出建议</Button>
                             </Space>
                         </Space>
@@ -332,16 +405,18 @@ const StudentDAOPage = () => {
                         dataSource={proposalList}
                         renderItem={proposal => (
                             <List.Item
-                            actions={[<Button onClick={onVote(true, proposal.index)}>支持</Button>,
-                                      <Button onClick={onVote(false, proposal.index)}>反对</Button>,
-                                        account == manager && getTime(proposal) && <Button onClick={onDecideProposal(proposal.index)}>结算</Button>
+                            actions={[<Button onClick={onVote(true, proposal.index)}  icon = {<SmileOutlined />}>支持</Button>,
+                                      <Button onClick={onVote(false, proposal.index)} icon = {<FrownOutlined />}>反对</Button>,
+                                        account == manager && getTime(proposal) && <Button onClick={onDecideProposal(proposal.index)} icon={<CheckCircleOutlined />}>结算</Button>
                                         ]}
                             style={{
                                 backgroundColor: getTime(proposal) ? ((proposal.approvement >= proposal.disapprovement)?"#bed742a5":"#ef973ea5")
                              : "#f4e1b4"}}
                             >
                                 <List.Item.Meta
-                                title={proposal.name}
+                                title={<div>
+                                    Content &nbsp;&nbsp;<EditOutlined /><br></br>{proposal.name}
+                                    </div>}
                                 description={<ProposalTableList start={proposal.startTime} duration={proposal.duration}
                                             approvement = {proposal.approvement} disapprovement = {proposal.disapprovement} proposer = {proposal.proposer}/>}
                                 />
