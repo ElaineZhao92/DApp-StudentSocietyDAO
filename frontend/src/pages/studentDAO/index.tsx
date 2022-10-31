@@ -1,6 +1,6 @@
-import {Button, Image, List, Divider, InputNumber, Input, Space, Avatar, Carousel, Col, Row, Statistic} from 'antd';
-import {LoadingOutlined, EllipsisOutlined, UserOutlined, EditOutlined,SmileOutlined, FrownOutlined, CheckCircleOutlined} from "@ant-design/icons";
-import {Head} from "../../pic"
+import {Button, Image, List, Divider, InputNumber, Input, Space, Avatar, Carousel, Tag} from 'antd';
+import {EllipsisOutlined, UserOutlined, EditOutlined,SmileOutlined, FrownOutlined, CheckCircleOutlined} from "@ant-design/icons";
+import {Head1, Head2, Head3} from "../../pic"
 import {useEffect, useState, createElement} from 'react';
 import {studentDAOContract, myERC20Contract, myERC721Contract, web3} from "../../utils/contracts";
 import React from 'react';
@@ -191,7 +191,7 @@ const StudentDAOPage = () => {
                 await myERC20Contract.methods.airdrop().send({
                     from: account
                 })
-                alert('领取成功啦～恭喜您获得1000通证积分, 可以用来提出提案或者投票哦')
+                alert('领取成功啦～恭喜您获得2000通证积分, 可以用来提出提案或者投票哦')
             } catch (error: any) {
                 alert(error.message)
             }
@@ -325,13 +325,13 @@ const StudentDAOPage = () => {
         <div className='container'>
             <Carousel autoplay>
                 <div>
-                    <Image  preview={{ visible: false }} width='70%' height='120px' src={Head} style={contentStyle}/>
+                    <Image  preview={{ visible: false }} width='70%' height='120px' src={Head1} style={contentStyle}/>
                 </div>
                 <div>
-                    <h3 style={contentStyle}>2</h3>
+                    <Image  preview={{ visible: false }} width='70%' height='70%' src={Head2} style={contentStyle}/>
                 </div>
                 <div>
-                    <h3 style={contentStyle}>3</h3>
+                    <Image  preview={{ visible: false }} width='70%' height='100%' src={Head3} style={contentStyle}/>
                 </div>
                 <div>
                     <h3 style={contentStyle}>4</h3>
@@ -340,11 +340,17 @@ const StudentDAOPage = () => {
             <div className='main'>
                 <h2 style = {{color:'#0a6c74'}}>去中心化学生社团组织管理平台</h2>
                 <h1 style = {{color:'#14919b'}}>studentDAO</h1>
-                <div style = {{color:'#14919b'}} >管理员地址：<span style = {{color:'#044e54'}}>{manager}</span></div>
+                <div style = {{color:'#14919b'}} >
+                    <Tag color="cyan">管理员地址</Tag>
+                    <span style = {{color:'#044e54'}}>{manager}</span>
+                </div>
                 <div className='account'>
-                    {account === '' && <Button onClick={onClickConnectWallet}>连接钱包</Button>}
-                    <div style = {{color:'#14919b'}}>当前用户：<span style = {{color:'#044e54'}}>{account === '' ? '无用户连接' : account}</span></div>
-                    <Button onClick={onClaimTokenAirdrop} style = {{color:'#044e54'}}>领取通证积分</Button>
+                    {account === '' && <Button type="primary" ghost
+                            onClick={onClickConnectWallet}>连接钱包</Button>}
+                    <div style = {{color:'#14919b'}}><Tag color="cyan"> 当前用户 </Tag><span style = {{color:'#044e54'}}>{account === '' ? '无用户连接' : account}</span></div>
+                    <Button 
+                        type="primary" ghost 
+                        onClick={onClaimTokenAirdrop}>领取通证积分</Button>
                     <div style = {{color:'#14919b'}}>当前用户拥有通证积分: <span style = {{color:'#044e54'}}>{account === '' ? 0 : accountBalance}</span></div>
                         <div className="NFTs">
                         <List
@@ -400,14 +406,14 @@ const StudentDAOPage = () => {
                         <List
                         size="small"
                         bordered
-                        header={<div style = {{color:'#14919b'}}>当前总建议数：<span style = {{color:'#14919b'}}>{account === '' ? 0 : totalProposalAmount} </span></div>}
+                        header={<div style = {{color:'#14919b'}}>当前总提案数 <span style = {{color:'#14919b'}}>{account === '' ? 0 : totalProposalAmount} </span></div>}
                         footer={<div style = {{color:'#14919b'}}>Proposal List real-time updates</div>}
                         dataSource={proposalList}
                         renderItem={proposal => (
                             <List.Item
-                            actions={[<Button onClick={onVote(true, proposal.index)}  icon = {<SmileOutlined />}>支持</Button>,
-                                      <Button onClick={onVote(false, proposal.index)} icon = {<FrownOutlined />}>反对</Button>,
-                                        account == manager && getTime(proposal) && <Button onClick={onDecideProposal(proposal.index)} icon={<CheckCircleOutlined />}>结算</Button>
+                            actions={[<Button type="primary" ghost onClick={onVote(true, proposal.index)}  icon = {<SmileOutlined />}>支持</Button>,
+                                      <Button type="primary" ghost onClick={onVote(false, proposal.index)} icon = {<FrownOutlined />}>反对</Button>,
+                                        account == manager && getTime(proposal) && <Button  type='primary' ghost onClick={onDecideProposal(proposal.index)} icon={<CheckCircleOutlined />}>结算</Button>
                                         ]}
                             style={{
                                 backgroundColor: getTime(proposal) ? ((proposal.approvement >= proposal.disapprovement)?"#bed742a5":"#ef973ea5")

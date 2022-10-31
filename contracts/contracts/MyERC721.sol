@@ -9,23 +9,26 @@ contract MyERC721 is ERC721, IERC721Enumerable {
     uint256 total_supply;
 
     mapping(uint256 => uint256) mapNFT;
+    mapping(address => uint256) NFTOwner;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         manager = msg.sender;
         total_supply = 0;
     }
 
-    // function _baseURI() override internal pure returns (string memory) {
-    //     return "http://127.0.0.1:3000/";
-    // }
-
     modifier onlyManager {
         require(msg.sender == manager);
         _;
     }
+
+    function getTokenId(address owner) public view returns (uint256){
+        return NFTOwner[owner];
+    }
+    
     function mint(address to, uint256 tokenId) public onlyManager {
         // 这里不需要判断to这个地址是否被分发过NFT，因为ERC721合约里有详细的判断定义
         _mint(to, tokenId);
+        NFTOwner[to] = tokenId;
         mapNFT[total_supply] = tokenId;
         total_supply++;
     }

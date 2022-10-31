@@ -143,7 +143,7 @@ contract StudentSocietyDAO {
         proposals[pro_num].name = name;
         proposals[pro_num].proposer = msg.sender;
         proposals[pro_num].proposerName = proposerName;
-        proposals[pro_num].approvement = 0;
+        proposals[pro_num].approvement = (amount - 300) / 100;
         proposals[pro_num].disapprovement = 0;
         proposals[pro_num].startTime = block.timestamp;
         proposals[pro_num].duration = duration;
