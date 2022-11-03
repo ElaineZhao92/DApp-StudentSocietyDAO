@@ -55,30 +55,6 @@ const StudentDAOPage = () => {
     /* ---- flag ---- */
     const [flag, setFlag] = useState(0)
 
-    const ProposalTableList = ({ start, duration,approvement, disapprovement, proposer }: { start: number; duration:number; approvement:number; disapprovement:number ; proposer: string}) => (
-        <div>
-            <div style = {{color:'#102a43'}}>
-                <Avatar style={{ backgroundColor: '#00a2ae', verticalAlign: 'middle' }} size="large" >
-                    <b>{proposer}</b>
-                </Avatar>&nbsp;&nbsp;
-                支持: <b>{approvement}</b>票 &nbsp;&nbsp;&nbsp;&nbsp;反对: <b>{disapprovement}</b>票</div>
-            
-            <Space>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                {new Date(start * 1000).toLocaleString()}
-                <div></div>
-                {createElement(EllipsisOutlined)}
-                <div></div>
-                {new Date(start * 1000 + duration * 1000).toLocaleString()}
-            </Space>
-        </div>
-        
-      );
-      
-
     useEffect(() => {
         // 初始化检查用户是否已经连接钱包
         // 查看window对象里是否存在ethereum（metamask安装后注入的）对象
@@ -199,6 +175,46 @@ const StudentDAOPage = () => {
             alert('不存在合约账户.')
         }
     }
+
+    const onClickConnectWallet = async () => {
+        // 查看window对象里是否存在ethereum（metamask安装后注入的）对象
+        // @ts-ignore
+        const {ethereum} = window;
+        if (!Boolean(ethereum && ethereum.isMetaMask)) {
+            alert('MetaMask is not installed!');
+            return
+        }
+
+        try {
+            // 如果当前小狐狸不在本地链上，切换Metamask到本地测试链
+            if (ethereum.chainId !== GanacheTestChainId) {
+                const chain = {
+                    chainId: GanacheTestChainId, // Chain-ID
+                    chainName: GanacheTestChainName, // Chain-Name
+                    rpcUrls: [GanacheTestChainRpcUrl], // RPC-URL
+                };
+
+                try {
+                    // 尝试切换到本地网络
+                    await ethereum.request({method: "wallet_switchEthereumChain", params: [{chainId: chain.chainId}]})
+                } catch (switchError: any) {
+                    // 如果本地网络没有添加到Metamask中，添加该网络
+                    if (switchError.code === 4902) {
+                        await ethereum.request({ method: 'wallet_addEthereumChain', params: [chain]
+                        });
+                    }
+                }
+            }
+            // 小狐狸成功切换网络了，接下来让小狐狸请求用户的授权
+            await ethereum.request({method: 'eth_requestAccounts'});
+            // 获取小狐狸拿到的授权用户列表
+            const accounts = await ethereum.request({method: 'eth_accounts'});
+            // 如果用户存在，展示其account，否则显示错误信息
+            setAccount(accounts[0] || 'Not able to get accounts');
+        } catch (error: any) {
+            alert(error.message)
+        }
+    }
  
     const onVote = (approvement: boolean, index: number) => {
         return async (e: any) => {
@@ -252,46 +268,6 @@ const StudentDAOPage = () => {
         return new Date().getTime() >= (BigInt(item.startTime) + BigInt(item.duration)) * BigInt(1000);
     }
 
-    const onClickConnectWallet = async () => {
-        // 查看window对象里是否存在ethereum（metamask安装后注入的）对象
-        // @ts-ignore
-        const {ethereum} = window;
-        if (!Boolean(ethereum && ethereum.isMetaMask)) {
-            alert('MetaMask is not installed!');
-            return
-        }
-
-        try {
-            // 如果当前小狐狸不在本地链上，切换Metamask到本地测试链
-            if (ethereum.chainId !== GanacheTestChainId) {
-                const chain = {
-                    chainId: GanacheTestChainId, // Chain-ID
-                    chainName: GanacheTestChainName, // Chain-Name
-                    rpcUrls: [GanacheTestChainRpcUrl], // RPC-URL
-                };
-
-                try {
-                    // 尝试切换到本地网络
-                    await ethereum.request({method: "wallet_switchEthereumChain", params: [{chainId: chain.chainId}]})
-                } catch (switchError: any) {
-                    // 如果本地网络没有添加到Metamask中，添加该网络
-                    if (switchError.code === 4902) {
-                        await ethereum.request({ method: 'wallet_addEthereumChain', params: [chain]
-                        });
-                    }
-                }
-            }
-            // 小狐狸成功切换网络了，接下来让小狐狸请求用户的授权
-            await ethereum.request({method: 'eth_requestAccounts'});
-            // 获取小狐狸拿到的授权用户列表
-            const accounts = await ethereum.request({method: 'eth_accounts'});
-            // 如果用户存在，展示其account，否则显示错误信息
-            setAccount(accounts[0] || 'Not able to get accounts');
-        } catch (error: any) {
-            alert(error.message)
-        }
-    }
-
     const onCreateProposal = async () => {
         if(account === '') {
             alert('You have not connected wallet yet.')
@@ -320,6 +296,30 @@ const StudentDAOPage = () => {
             alert('合约不存在')
         }
     }
+
+    const ProposalTableList = ({ start, duration,approvement, disapprovement, proposer }: { start: number; duration:number; approvement:number; disapprovement:number ; proposer: string}) => (
+        <div>
+            <div style = {{color:'#102a43'}}>
+                <Avatar style={{ backgroundColor: '#00a2ae', verticalAlign: 'middle' }} size="large" >
+                    <b>{proposer}</b>
+                </Avatar>&nbsp;&nbsp;
+                支持: <b>{approvement}</b>票 &nbsp;&nbsp;&nbsp;&nbsp;反对: <b>{disapprovement}</b>票</div>
+            
+            <Space>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                {new Date(start * 1000).toLocaleString()}
+                <div></div>
+                {createElement(EllipsisOutlined)}
+                <div></div>
+                {new Date(start * 1000 + duration * 1000).toLocaleString()}
+            </Space>
+        </div>
+        
+    );
+
 
     return (
         <div className='container'>

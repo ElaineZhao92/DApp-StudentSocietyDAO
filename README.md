@@ -129,7 +129,7 @@ struct Proposal {
 
 ​		在提案栏目中，使用了前端的List对所有提案进行展示。`ProposalList`中会显示提案内容、发起者姓名、提案发送和结束的时间等信息。为了方便用户辨识，未到投票截止时间的`proposal`将显示黄色背景；如果提案被通过，将显示绿色背景；如果提案不通过，将显示橙色背景 。右下图是提案栏目的三种状态。
 
-<img src="pics/7.png" alt="7" style="zoom:30%;" /><img src="pics/8.png" alt="8" style="zoom:33%;" />
+<img src="pics/12.JPG" alt="12" style="zoom:30%;" />
 
 ​		用户通过点击`支持`或者`反对`按钮，对该投案进行投票。代码中使用到`proposal`结构体中的`times`变量，对用户投票的次数进行控制。以下是投票的合约代码:
 
@@ -157,7 +157,7 @@ function vote(uint32 index, bool vote_, uint32 amount) public {
 
 ​		根据规则，成功通过的提案，提出者将能获得提案得到支持票对应的所有通证积分。我们切换到管理员界面对提案进行确认。管理员界面会比普通用户多一个'结算'按钮，当然这个按钮只有投票结束的提案才会出现(如右下图)。
 
-<img src="pics/9.png" alt="9" style="zoom:33%;" /><img src="pics/10.png" alt="10" style="zoom:33%;" />
+<img src="pics/13.JPG" alt="13" style="zoom:33%;" />
 
 ​		根据合约中的代码，我们将使用到`ERC20`的`transfer`函数，向提案的提出者转入一定数量通证积分奖励。支持票的通证积分将全部奖励给提案提出者，但是反对票的通证积分将被销毁(转入某个deadAddress)。
 
